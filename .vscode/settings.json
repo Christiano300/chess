@@ -1,3 +1,24 @@
 {
-    "python.formatting.provider": "yapf"
+    "python.formatting.provider": "autopep8",
+    "python.languageServer": "Pylance",
+    "python.linting.pylintEnabled": false,
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingModuleSource": "none"
+    },
+    "python.analysis.extraPaths": [
+        "",
+        "c:\\Users\\Christian\\.vscode\\extensions\\joedevivo.vscode-circuitpython-0.1.19-win32-x64\\stubs",
+        "c:\\Users\\Christian\\AppData\\Roaming\\Code\\User\\globalStorage\\joedevivo.vscode-circuitpython\\bundle\\20221117\\adafruit-circuitpython-bundle-py-20221117\\lib"
+    ],
+    "circuitpython.board.version": null,
+    "python.analysis.typeCheckingMode": "basic",
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        ".",
+        "-p",
+        "*_test.py"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true
 }
