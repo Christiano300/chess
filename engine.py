@@ -1,3 +1,4 @@
+from functools import lru_cache
 from multiprocessing import Pipe, Process
 from multiprocessing.connection import Connection
 from subprocess import STDOUT, Popen, PIPE
@@ -10,7 +11,30 @@ from time import sleep
 ONE_INT_ARG_TOKENS = ("depth", "seldepth", "time", "nodes", "multipv",
                   "currmovenumber", "hashfull", "nps", "tbhits", "cpuload")
 
-Move = tuple[tuple[int, int], tuple[int, int]]
+# Move = tuple[tuple[int, int], tuple[int, int]]
+class Move:
+    def __init__(self, src: tuple[int, int], dest: tuple[int, int], promote=""):
+        self.src = src
+        self.dest = dest
+        self.promote = promote
+    
+    def to_uci(self) -> str:
+        return f"{chr(self.src[0] + 97)}{self.src[1] + 1}{chr(self.dest[0] + 97)}{self.dest[1] + 1}{self.promote}"
+    
+    def __str__(self) -> str:
+        return f"{self.src[0]}{self.src[1]}{self.dest[0]}{self.dest[1]}"
+
+    __repr__ = __str__
+    
+    def __eq__(self, other):
+        if not type(self) == type(other):
+            return False
+        return self.src == other.src and self.dest == other.dest
+    
+    @classmethod
+    def from_str(cls, str):
+        return cls((int(str[0]), int(str[1])), (int(str[2]), int(str[3])), str[4] if len(str) > 4 else "")
+    
 
 _ArgValue = dict[str, str | list[str] | dict[str, int]] | list[str] | list[Move]
 _Argument = tuple[str, _ArgValue]
@@ -127,7 +151,6 @@ class EngineManager:
         print(f"engine recieved {command}")
         self._write_raw(command)
 
-
 def parse_info(args: list[str]) -> _ArgValue:
     res = {}
     i = 1
@@ -199,11 +222,8 @@ def get_engine_thread():
     return ui_conn, engine_thread
 
 def uci_to_move(uci: str) -> Move:
-    return ((ord(uci[0]) - 97, int(uci[1]) - 1), (ord(uci[2]) - 97, int(uci[3]) - 1))
+    return Move((ord(uci[0]) - 97, int(uci[1]) - 1), (ord(uci[2]) - 97, int(uci[3]) - 1))
 
-
-def move_to_uci(move: Move) -> str:
-    return f"{chr(move[0][0] + 97)}{move[0][1] + 1}{chr(move[1][0] + 97)}{move[1][1] + 1}"
 
 def main():
     def queue(output_queue: Queue):
